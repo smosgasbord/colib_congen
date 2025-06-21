@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Content Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(214.3 31.8% 91.4%)",
+                        input: "hsl(214.3 31.8% 91.4%)",
+                        ring: "hsl(222.2 84% 4.9%)",
+                        background: "hsl(0 0% 100%)",
+                        foreground: "hsl(222.2 84% 4.9%)",
+                        primary: {
+                            DEFAULT: "hsl(222.2 47.4% 11.2%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(0 84.2% 60.2%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(215.4 16.3% 46.9%)",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        popover: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        card: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        
+        .select-dropdown {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 14M5 17l14-14"></path>
+                </svg>
+                <h1 class="text-4xl font-bold text-gray-900">Social Media Content Generator</h1>
+            </div>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Generate engaging social media content ideas tailored to your topic and preferred platform
+            </p>
+        </div>
+
+        <!-- Input Form -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 max-w-2xl mx-auto mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Generate Content Ideas</h2>
+                <p class="text-sm text-gray-600 mt-1">Enter your topic and select the platform you want content ideas for</p>
+            </div>
+            <div class="p-6">
+                <form id="contentForm" class="space-y-6">
+                    <!-- Topic Input -->
+                    <div class="space-y-2">
+                        <label for="topic" class="block text-sm font-medium text-gray-700">Topic</label>
+                        <input 
+                            type="text" 
+                            id="topic" 
+                            name="topic"
+                            placeholder="e.g., sustainable living, digital marketing, fitness tips..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <!-- Platform Selection -->
+                    <div class="space-y-2">
+                        <label for="platform" class="block text-sm font-medium text-gray-700">Select Platform</label>
+                        <select 
+                            id="platform" 
+                            name="platform"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 select-dropdown"
+                            required
+                        >
+                            <option value="">Choose a platform...</option>
+                            <option value="twitter">🐦 Twitter</option>
+                            <option value="instagram">📸 Instagram</option>
+                            <option value="facebook">👥 Facebook</option>
+                            <option value="linkedin">💼 LinkedIn</option>
+                        </select>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 rounded-md p-4">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-red-800 text-sm font-medium">Error</p>
+                                <p id="errorText" class="text-red-700 text-sm"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        id="submitBtn"
+                        class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 14M5 17l14-14"></path>
+                        </svg>
+                        <span id="submitText">Generate Content Ideas</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 max-w-2xl mx-auto mb-8">
+            <div class="p-8">
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <div class="relative">
+                        <svg class="w-12 h-12 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <svg class="w-6 h-6 text-yellow-500 absolute -top-1 -right-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 14M5 17l14-14"></path>
+                        </svg>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            Gathering information and generating ideas<span class="loading-dots"></span>
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                            This may take up to 3 minutes while we create personalized content for <span id="selectedPlatformName"></span>
+                        </p>
+                    </div>
+                    <div id="platformBadge" class="flex items-center space-x-1 bg-gray-100 px-4 py-2 rounded-full">
+                        <span id="platformIcon"></span>
+                        <span id="platformText" class="text-sm text-gray-700"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mock Data Notice -->
+        <div id="mockNotice" class="hidden bg-blue-50 border border-blue-200 rounded-md p-4 max-w-4xl mx-auto mb-6">
+            <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <p class="text-blue-800 text-sm">
+                        <strong>Demo Mode:</strong> The webhook is currently experiencing timeouts, so we're showing sample content ideas. The actual webhook integration will provide AI-generated content once the timeout issues are resolved.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+                Generated Content Ideas
+            </h2>
+            <div id="contentContainer" class="space-y-4">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const WEBHOOK_URL = 'https://n8n.system.smosgasbord.xyz/webhook/01a061e0-3d77-4ebc-b157-0c59e3af48ce';
+        const TIMEOUT_MS = 180000; // 3 minutes
+
+        // Platform configurations
+        const platforms = {
+            twitter: { name: 'Twitter', icon: '🐦', color: 'text-blue-500' },
+            instagram: { name: 'Instagram', icon: '📸', color: 'text-pink-500' },
+            facebook: { name: 'Facebook', icon: '👥', color: 'text-blue-600' },
+            linkedin: { name: 'LinkedIn', icon: '💼', color: 'text-blue-700' }
+        };
+
+        // DOM elements
+        const form = document.getElementById('contentForm');
+        const topicInput = document.getElementById('topic');
+        const platformSelect = document.getElementById('platform');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const loadingState = document.getElementById('loadingState');
+        const mockNotice = document.getElementById('mockNotice');
+        const results = document.getElementById('results');
+        const contentContainer = document.getElementById('contentContainer');
+
+        // Utility functions
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        function showLoading(platformId) {
+            const platform = platforms[platformId];
+            document.getElementById('selectedPlatformName').textContent = platform.name;
+            document.getElementById('platformIcon').textContent = platform.icon;
+            document.getElementById('platformText').textContent = platform.name;
+            
+            submitBtn.disabled = true;
+            submitText.innerHTML = `
+                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Gathering information and generating ideas...
+            `;
+            loadingState.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            submitBtn.disabled = false;
+            submitText.innerHTML = `
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 14M5 17l14-14"></path>
+                </svg>
+                Generate Content Ideas
+            `;
+            loadingState.classList.add('hidden');
+        }
+
+        // Fetch with timeout
+        async function fetchWithTimeout(url, options = {}, timeout = TIMEOUT_MS) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                clearTimeout(id);
+                throw error;
+            }
+        }
+
+        // Generate mock response
+        function generateMockResponse(topic) {
+            return [
+                {
+                    title: `🌟 Sample idea for ${topic}`,
+                    description: `This is mock content because the webhook timed out. Replace with real data once the workflow is up.`,
+                    publication: "v0 Demo",
+                    source_link: "https://vercel.com"
+                }
+            ];
+        }
+
+        // Parse webhook response
+        function parseWebhookResponse(rawData) {
+            console.log('🔍 Parsing webhook response:', rawData);
+            
+            // If we already have an array of ideas → return as-is
+            if (Array.isArray(rawData) && rawData.length && rawData[0]?.title) {
+                console.log('✅ Found direct array format');
+                return rawData;
+            }
+
+            // If we have the n8n wrapper shape
+            if (Array.isArray(rawData) && rawData.length && rawData[0]?.output) {
+                const output = rawData[0].output;
+                console.log('🔍 Found n8n wrapper, extracting output:', output);
+
+                if (typeof output === 'string') {
+                    try {
+                        const parsed = JSON.parse(output);
+                        if (Array.isArray(parsed)) {
+                            console.log('✅ Successfully parsed string output');
+                            return parsed;
+                        }
+                    } catch (error) {
+                        console.error('❌ JSON Parse Error:', error);
+                    }
+                } else if (Array.isArray(output)) {
+                    console.log('✅ Output is already array');
+                    return output;
+                }
+            }
+
+            console.log('⚠️ Using fallback - returning raw data');
+            return rawData;
+        }
+
+        // Call webhook
+        async function callWebhook(topic, platform) {
+            const payload = { 
+                topic, 
+                platforms: [platform], 
+                timestamp: new Date().toISOString() 
+            };
+
+            console.log('🚀 Starting webhook request with payload:', payload);
+
+            const attempts = [
+                {
+                    url: WEBHOOK_URL,
+                    options: {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    },
+                    label: 'Production POST'
+                },
+                {
+                    url: `${WEBHOOK_URL}?${new URLSearchParams(payload).toString()}`,
+                    options: { method: 'GET' },
+                    label: 'Production GET'
+                }
+            ];
+
+            for (let i = 0; i < attempts.length; i++) {
+                const { url, options, label } = attempts[i];
+                console.log(`📡 Attempt ${i + 1}/${attempts.length}: ${label}`);
+
+                try {
+                    const startTime = Date.now();
+                    const response = await fetchWithTimeout(url, options);
+                    const duration = Date.now() - startTime;
+
+                    console.log(`⏱️ Request completed in ${duration}ms`);
+                    console.log(`📊 Response status: ${response.status}`);
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        console.log(`❌ Error response:`, text);
+                        
+                        if (text.includes('Workflow could not be started')) {
+                            console.log('🔄 Workflow not started, trying next endpoint...');
+                            continue;
+                        }
+                        throw new Error(`Webhook returned ${response.status}: ${text}`);
+                    }
+
+                    const rawText = await response.text();
+                    console.log(`📝 Raw response length: ${rawText.length} characters`);
+                    console.log(`📝 Raw response preview:`, rawText.substring(0, 500));
+
+                    if (!rawText.trim()) {
+                        console.log('⚠️ Empty response, trying next attempt...');
+                        throw new Error('Empty response');
+                    }
+
+                    // Parse JSON only when it looks like JSON
+                    const looksLikeJson = rawText.trim().startsWith('{') || rawText.trim().startsWith('[');
+                    console.log(`🔍 Looks like JSON: ${looksLikeJson}`);
+
+                    const parsed = looksLikeJson ? JSON.parse(rawText) : null;
+                    const data = parseWebhookResponse(parsed || rawText);
+
+                    console.log('✅ Successfully processed webhook response');
+                    return { success: true, data, isMock: false };
+
+                } catch (error) {
+                    console.log(`❌ Attempt ${i + 1} failed:`, error);
+                    
+                    if (error.name === 'AbortError') {
+                        console.log('⏰ Request timed out, trying next attempt...');
+                    }
+                    continue;
+                }
+            }
+
+            console.warn('🚨 All webhook attempts failed – serving mock data');
+            return { success: true, data: generateMockResponse(topic), isMock: true };
+        }
+
+        // Render content
+        function renderContent(items, isMock = false) {
+            if (isMock) {
+                mockNotice.classList.remove('hidden');
+            } else {
+                mockNotice.classList.add('hidden');
+            }
+
+            contentContainer.innerHTML = '';
+
+            if (Array.isArray(items) && items.length > 0 && items[0]?.title) {
+                // Webhook format
+                items.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-lg shadow-sm border border-gray-200 border-l-4 border-l-blue-500';
+                    card.innerHTML = `
+                        <div class="p-4">
+                            <div class="space-y-3">
+                                <h3 class="font-semibold text-lg text-gray-900">${item.title}</h3>
+                                <p class="text-gray-600 leading-relaxed">${item.description}</p>
+                                ${item.source_link ? `
+                                    <div class="flex items-center gap-2 text-sm text-blue-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        <a href="${item.source_link}" target="_blank" rel="noopener noreferrer" class="hover:underline">
+                                            ${item.publication || 'Source'}
+                                        </a>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    contentContainer.appendChild(card);
+                });
+            } else {
+                // Raw format fallback
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-sm border border-gray-200';
+                card.innerHTML = `
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Generated Content</h3>
+                        <pre class="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded-md overflow-auto">${typeof items === 'string' ? items : JSON.stringify(items, null, 2)}</pre>
+                    </div>
+                `;
+                contentContainer.appendChild(card);
+            }
+
+            results.classList.remove('hidden');
+        }
+
+        // Form submission handler
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const topic = topicInput.value.trim();
+            const platform = platformSelect.value;
+
+            // Validation
+            if (!topic) {
+                showError('Please enter a topic');
+                return;
+            }
+
+            if (!platform) {
+                showError('Please select a platform');
+                return;
+            }
+
+            // Reset state
+            hideError();
+            results.classList.add('hidden');
+            mockNotice.classList.add('hidden');
+            showLoading(platform);
+
+            try {
+                const result = await callWebhook(topic, platform);
+                
+                if (result.success) {
+                    renderContent(result.data, result.isMock);
+                } else {
+                    showError('Failed to generate content ideas');
+                }
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                showError('An unexpected error occurred');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Initialize
+        console.log('🚀 Social Media Content Generator initialized');
+    </script>
+</body>
+</html>
